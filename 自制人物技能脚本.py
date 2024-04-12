@@ -1,0 +1,32 @@
+def keyPressed(c):
+	if c.key == 65:
+		# F7 改变为灵魂出窍状态
+		playerName = c.player.getDisplayName()
+		curGamemode = c.player.getGamemode()
+		if curGamemode != 3:
+			c.player.getStoreddata().put(playerName+"originalGamemode", curGamemode)
+			pos = c.player.getPos()
+			x = pos.getX()
+			y = pos.getY()
+			z = pos.getZ()
+			standEntity = c.API.getClones().spawn(x, y, z, 1, "PlayerNpc", c.player.getWorld())
+			c.player.getStoreddata().put(playerName+"standEntity", standEntity.getUUID())
+			c.player.getStoreddata().put(playerName+"originalX", x)
+			c.player.getStoreddata().put(playerName+"originalY", y)
+			c.player.getStoreddata().put(playerName+"originalZ", z)
+			standEntity.getDisplay().setName(c.player.getName())
+			standEntity.updateClient()
+			standEntity.getDisplay().setSkinPlayer(c.player.getName())
+			c.player.setGamemode(3)
+		else:
+			x = float(c.player.getStoreddata().get(playerName+"originalX"))
+			y = float(c.player.getStoreddata().get(playerName+"originalY"))
+			z = float(c.player.getStoreddata().get(playerName+"originalZ"))
+			c.player.setPosition(x, y, z)
+			c.player.setGamemode(int(c.player.getStoreddata().get(playerName+"originalGamemode")))
+			standEntity = c.player.getWorld().getEntity(c.player.getStoreddata().get(playerName+"standEntity"))
+			standEntity.kill()
+			c.player.getStoreddata().remove(playerName+"originalX")
+			c.player.getStoreddata().remove(playerName+"originalY")
+			c.player.getStoreddata().remove(playerName+"originalZ")
+			c.player.getStoreddata().remove(playerName+"originalGamemode")
